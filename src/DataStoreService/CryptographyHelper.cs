@@ -123,7 +123,7 @@ namespace DataStoreService
         }
 
         /// <summary>
-        /// Decrip data using private key
+        /// Decript data using private key
         /// </summary>
         /// <param name="DataToDecrypt"> DataToDecrypt</param>
         /// <param name="RSAKeyInfo"></param>
@@ -154,6 +154,99 @@ namespace DataStoreService
 
                 return null;
             }
+
+        }
+
+        /// <summary>
+        /// Hash the data and generate signature
+        /// </summary>
+        /// <param name="dataToSign"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static byte[] HashAndSignBytes(byte[] dataToSign, RSAParameters key)
+        {
+            try
+            {
+                // Create a new instance of RSACryptoServiceProvider using the  
+                // key from RSAParameters.  
+                RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+
+                RSA.ImportParameters(key);
+
+                // Hash and sign the data. Pass a new instance of SHA1CryptoServiceProvider 
+                // to specify the use of SHA1 for hashing. 
+                return RSA.SignData(dataToSign, new SHA1CryptoServiceProvider());
+            }
+            catch (CryptographicException e)
+            {
+                Console.WriteLine(e.Message);
+
+                return null;
+            }
+        }
+
+
+        /// <summary>
+        /// Hash the data and generate signature
+        /// </summary>
+        /// <param name="dataToSign"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static string HashAndSignString(string dataToSign, RSAParameters key)
+        {
+            UnicodeEncoding ByteConverter = new UnicodeEncoding();
+            byte[] signatureBytes = HashAndSignBytes(ByteConverter.GetBytes(dataToSign), key);
+
+            return ByteConverter.GetString(signatureBytes);
+
+        }
+
+        /// <summary>
+        /// Verify the data and signature
+        /// </summary>
+        /// <param name="dataToVerify"></param>
+        /// <param name="signedData"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static bool VerifySignedData(byte[] dataToVerify, byte[] signedData, RSAParameters key)
+        {
+            try
+            {
+                // Create a new instance of RSACryptoServiceProvider using the  
+                // key from RSAParameters.
+                RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
+
+                RSA.ImportParameters(key);
+
+                // Verify the data using the signature.  Pass a new instance of SHA1CryptoServiceProvider 
+                // to specify the use of SHA1 for hashing. 
+                return RSA.VerifyData(dataToVerify, new SHA1CryptoServiceProvider(), signedData);
+
+            }
+            catch (CryptographicException e)
+            {
+                Console.WriteLine(e.Message);
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verify the data and signature
+        /// </summary>
+        /// <param name="dataToVerify"></param>
+        /// <param name="signedData"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static bool VerifySignedData(string dataToVerify, byte[] signedData, string key)
+        {
+            UnicodeEncoding ByteConverter = new UnicodeEncoding();
+            RSAParameters rsaParameters;
+            if (CryptographyHelper.TryConvertPublicKeyToRSAParameters(key, out rsaParameters) == false)
+            {
+                return false;
+            }
+            return VerifySignedData(ByteConverter.GetBytes(dataToVerify), signedData, rsaParameters);
 
         }
     }
