@@ -59,7 +59,6 @@ namespace DataStoreService.Controllers
                     return BadRequest();
 
                 }
-                _storageService.GetProfile(id);
 
                 _storageService.SetProfile(id, signedEnvelope.Data);
                 return Ok();
