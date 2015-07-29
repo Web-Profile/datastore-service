@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Results;
 using DataStoreService.Services;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
 
 namespace DataStoreService.Controllers
 {
@@ -50,7 +52,16 @@ namespace DataStoreService.Controllers
         {
             try
             {
-                _storageService.SetProfile(id, data);
+                SignedEnvelope signedEnvelope = JsonConvert.DeserializeObject<SignedEnvelope>(data);
+
+                if(VerySignatureOfSignedEnvelope(id, signedEnvelope) == false)
+                {
+                    return BadRequest();
+
+                }
+                _storageService.GetProfile(id);
+
+                _storageService.SetProfile(id, signedEnvelope.Data);
                 return Ok();
             }
             catch (FileNotFoundException)
@@ -58,5 +69,27 @@ namespace DataStoreService.Controllers
                 return NotFound();
             }
         }
+
+        #region Validator
+        public bool VerySignatureOfSignedEnvelope(string id, SignedEnvelope signedEnvelope)
+        {
+            bool ret = false;
+
+            string profile = _storageService.GetProfile(id);
+
+            if (String.IsNullOrEmpty(profile) == false)
+            {
+                //TODO: Look into profile and search for public key
+                string key = signedEnvelope.AgentId;  ///HACK: should look into profile and grab public key of UserAget Service
+
+                if (CryptographyHelper.VerifySignedData(signedEnvelope.Data, signedEnvelope.Signature, key) == true)
+                {
+                    ret = true;
+                }
+            }
+
+            return ret;
+        }
+        #endregion
     }
 }
