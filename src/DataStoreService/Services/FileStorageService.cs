@@ -22,6 +22,7 @@ namespace DataStoreService.Services
             var profile = new Profile()
             {
                 Key = key,
+                Id = profileId,
                 Data = data
             };
 
