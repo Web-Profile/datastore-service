@@ -168,7 +168,7 @@
     <Compile Include="Services\Profile.cs" />
     <Compile Include="Services\FileStorageService.cs" />
     <Compile Include="Services\IStorageService.cs" />
-    <Compile Include="Services\SignedData.cs" />
+    <Compile Include="Services\SignedEnvelope.cs" />
     <Compile Include="UrlHelper.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -123,7 +123,7 @@ namespace DataStoreService
         }
 
         /// <summary>
-        /// Decript data using private key
+        /// Decrypt data using private key
         /// </summary>
         /// <param name="DataToDecrypt"> DataToDecrypt</param>
         /// <param name="RSAKeyInfo"></param>
