@@ -25,10 +25,11 @@ namespace DataStoreService.Controllers
 
         [HttpPost]
         [Route("api/profile", Name = "ProfileCreate")]
-        public IHttpActionResult CreateProfile(string key, string data)
+        public IHttpActionResult CreateProfile([FromBody] Profile profile)
         {
+
             //TODO: need to add idemptotent protection
-            var profileId = _storageService.CreateProfile(key, data);
+            var profileId = _storageService.CreateProfile(profile);
             var locationUrl = Url.Profile(profileId);
             var content = new { location = locationUrl };
             return Created(locationUrl, content);
@@ -40,7 +41,12 @@ namespace DataStoreService.Controllers
             try
             {
                 var jsonData = _storageService.GetProfile(id);
-                return Ok<object>(jsonData);
+
+                Profile profile = new Profile();
+                profile.Id = id;
+                profile.Data = jsonData;
+
+                return Ok(profile);
             }
             catch (FileNotFoundException)
             {
@@ -48,11 +54,12 @@ namespace DataStoreService.Controllers
             }
         }
 
-        public IHttpActionResult SetProfile(string id, string data)
+        [HttpPut]
+        [Route("api/profile/{id}", Name="ProfileSet")]
+        public IHttpActionResult SetProfile(string id, [FromBody] SignedEnvelope signedEnvelope)
         {
             try
             {
-                SignedEnvelope signedEnvelope = JsonConvert.DeserializeObject<SignedEnvelope>(data);
 
                 if(VerySignatureOfSignedEnvelope(id, signedEnvelope) == false)
                 {
