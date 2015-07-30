@@ -15,16 +15,9 @@ namespace DataStoreService.Services
         /// <param name="key">Public key value</param>
         /// <param name="data">Data blob</param>
         /// <returns></returns>
-        public string CreateProfile(string key, string data)
+        public string CreateProfile(Profile profile)
         {
             var profileId = Guid.NewGuid().ToString().Replace("-", "");
-
-            var profile = new Profile()
-            {
-                Key = key,
-                Id = profileId,
-                Data = data
-            };
 
             var profilePath = $"{AppDomain.CurrentDomain.BaseDirectory}/{RootPath}/{profileId}";
 

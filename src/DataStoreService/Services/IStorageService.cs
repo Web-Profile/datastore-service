@@ -8,7 +8,7 @@ namespace DataStoreService.Services
         /// <param name="key">Public key value</param>
         /// <param name="data">Data blob</param>
         /// <returns></returns>
-        string CreateProfile(string key, string data);
+        string CreateProfile(Profile data);
 
         /// <summary>
         /// Gets the profile for a given identifier.
